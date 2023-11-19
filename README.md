@@ -11,10 +11,10 @@ composer  require  morenorafael/subscription
 
 ```php
 'providers' => [
-/**
-* Third Party Service Providers...
-*/
-Morenorafael\Subscription\SubscriptionServiceProvider::class,
+    /**
+    * Third Party Service Providers...
+    */
+    Morenorafael\Subscription\SubscriptionServiceProvider::class,
 ...
 ```
 
