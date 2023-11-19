@@ -14,7 +14,7 @@ composer  require  morenorafael/subscription
 /**
 * Third Party Service Providers...
 */
-Morelorafael\Subscription\SubscriptionServiceProvider::class,
+Morenorafael\Subscription\SubscriptionServiceProvider::class,
 ...
 ```
 
@@ -23,7 +23,7 @@ Morelorafael\Subscription\SubscriptionServiceProvider::class,
 Publish package config file and migrations with the following command:
 
 ```sh
-php  artisan  vendor:publish  --provider="Morelorafael\Subscription\SubscriptionServiceProvider"
+php  artisan  vendor:publish  --provider="Morenorafael\Subscription\SubscriptionServiceProvider"
 ```
 
 ```sh
@@ -32,7 +32,7 @@ php  artisan  migrate
 
 ### Traits and Contracts
 
-Add `Morelorafael\Subscription\Traits\PlanSubscriber` trait and `Morelorafael\Subscription\Contracts\PlanSubscriberInterface` contract to your `User` model.
+Add `Morenorafael\Subscription\Traits\PlanSubscriber` trait and `Morenorafael\Subscription\Contracts\PlanSubscriberInterface` contract to your `User` model.
 
 See the following example:
 
