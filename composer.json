@@ -1,0 +1,33 @@
+{
+    "name": "morenorafael/subscription",
+    "description": "SaaS style recurring plans for Laravel.",
+    "keywords": [
+        "plans",
+        "laravel",
+        "subscriptions",
+        "memberships"
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Morenorafael\\Subscription\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rafael Moreno",
+            "email": "alejandro8924@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+        "orchestra/testbench": "dev-develop"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Morenorafael\\Subscription\\Providers\\SubscriptionServiceProvider"
+            ]
+        }
+    }
+}

@@ -1,0 +1,8 @@
+/vendor
+/.phpintel
+/docs/_build
+composer.phar
+*.sublime-workspace
+.phpunit.result.cache
+/.idea
+/.vscode
