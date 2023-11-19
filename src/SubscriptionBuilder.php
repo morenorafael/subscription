@@ -3,7 +3,6 @@
 namespace Morenorafael\Subscription;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Morenorafael\Subscription\Contracts\SubscriptionBuilderInterface;
 use Morenorafael\Subscription\Models\PlanSubscription;
 

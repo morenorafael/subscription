@@ -3,7 +3,7 @@
 namespace Morenorafael\Subscription\Traits;
 
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\App;
 use Morenorafael\Subscription\SubscriptionUsageManager;
 use Morenorafael\Subscription\Contracts\SubscriptionBuilderInterface;
@@ -17,7 +17,7 @@ trait PlanSubscriber
         return App::make(SubscriptionResolverInterface::class)->resolve($this, $name);
     }
 
-    public function subscriptions(): HasOne
+    public function subscriptions(): MorphMany
     {
         return $this->morphMany(config('subscription.models.plan_subscription'), 'subscribable');
     }
@@ -41,7 +41,7 @@ trait PlanSubscriber
         return false;
     }
 
-    public function newSubscription(string $subscription, $plan): PlanSubscription
+    public function newSubscription(string $subscription, $plan): SubscriptionBuilderInterface
     {
         $container = Container::getInstance();
 

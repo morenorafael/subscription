@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 7, 2)->default('0.00');
+            $table->decimal('price', 10, 2)->default('0.00');
             $table->string('interval')->default('month');
             $table->smallInteger('interval_count')->default(1);
             $table->smallInteger('trial_period_days')->nullable();

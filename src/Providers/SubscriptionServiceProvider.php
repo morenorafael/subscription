@@ -10,6 +10,8 @@ use Morenorafael\Subscription\Contracts\SubscriptionBuilderInterface;
 use Morenorafael\Subscription\Contracts\SubscriptionResolverInterface;
 use Morenorafael\Subscription\Contracts\PlanSubscriptionUsageInterface;
 use Illuminate\Support\Facades\Event;
+use Morenorafael\Subscription\SubscriptionBuilder;
+use Morenorafael\Subscription\SubscriptionResolver;
 
 class SubscriptionServiceProvider extends ServiceProvider
 {
