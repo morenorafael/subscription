@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Morenorafael\Subscription\Models\PlanFeature;
 use Morenorafael\Subscription\SubscriptionAbility;
 use Morenorafael\Subscription\Traits\BelongsToPlan;
@@ -88,35 +90,20 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      */
     protected $ability;
 
-    /**
-     * Get the subscribable of the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function subscribable()
+    public function subscribable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    /**
-     * Get subscription usage.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function usage()
+    public function usage(): HasMany
     {
         return $this->hasMany(
-            config('laraplans.models.plan_subscription_usage'),
+            config('subscription.models.plan_subscription_usage'),
             'subscription_id'
         );
     }
 
-    /**
-     * Get status attribute.
-     *
-     * @return string
-     */
-    public function getStatusAttribute()
+    public function getStatusAttribute(): string
     {
         if ($this->isActive()) {
             return self::STATUS_ACTIVE;
@@ -131,12 +118,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         }
     }
 
-    /**
-     * Check if subscription is active.
-     *
-     * @return bool
-     */
-    public function isActive()
+    public function isActive(): bool
     {
         if ((!$this->isEnded() or $this->onTrial()) and !$this->isCanceledImmediately()) {
             return true;
@@ -145,12 +127,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         return false;
     }
 
-    /**
-     * Check if subscription is trialling.
-     *
-     * @return bool
-     */
-    public function onTrial()
+    public function onTrial(): bool
     {
         if (!is_null($trialEndsAt = $this->trial_ends_at)) {
             return Carbon::now()->lt(Carbon::instance($trialEndsAt));
@@ -159,45 +136,24 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         return false;
     }
 
-    /**
-     * Check if subscription is canceled.
-     *
-     * @return bool
-     */
-    public function isCanceled()
+    public function isCanceled(): bool
     {
         return  !is_null($this->canceled_at);
     }
 
-    /**
-     * Check if subscription is canceled immediately.
-     *
-     * @return bool
-     */
     public function isCanceledImmediately()
     {
         return (!is_null($this->canceled_at) and $this->canceled_immediately === true);
     }
 
-    /**
-     * Check if subscription period has ended.
-     *
-     * @return bool
-     */
-    public function isEnded()
+    public function isEnded(): bool
     {
         $endsAt = Carbon::instance($this->ends_at);
 
         return Carbon::now()->gte($endsAt);
     }
 
-    /**
-     * Cancel subscription.
-     *
-     * @param  bool $immediately
-     * @return $this
-     */
-    public function cancel($immediately = false)
+    public function cancel(bool $immediately = false): self
     {
         $this->canceled_at = Carbon::now();
 
@@ -214,47 +170,28 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         return false;
     }
 
-    /**
-     * Change subscription plan.
-     *
-     * @param mixed $plan Plan Id or Plan Model Instance
-     * @return $this
-     */
-    public function changePlan($plan)
+    public function changePlan($plan): self
     {
         if (is_numeric($plan)) {
             $plan = App::make(PlanInterface::class)->find($plan);
         }
 
-        // If plans doesn't have the same billing frequency (e.g., interval
-        // and interval_count) we will update the billing dates starting
-        // today... and sice we are basically creating a new billing cycle,
-        // the usage data will be cleared.
         if (
             is_null($this->plan) or $this->plan->interval !== $plan->interval or
             $this->plan->interval_count !== $plan->interval_count
         ) {
-            // Set period
             $this->setNewPeriod($plan->interval, $plan->interval_count);
 
-            // Clear usage data
             $usageManager = new SubscriptionUsageManager($this);
             $usageManager->clear();
         }
 
-        // Attach new plan to subscription
         $this->plan_id = $plan->id;
 
         return $this;
     }
 
-    /**
-     * Renew subscription period.
-     *
-     * @throws  \LogicException
-     * @return  $this
-     */
-    public function renew()
+    public function renew(): self
     {
         if ($this->isEnded() and $this->isCanceled()) {
             throw new LogicException(
@@ -265,11 +202,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         $subscription = $this;
 
         DB::transaction(function () use ($subscription) {
-            // Clear usage data
             $usageManager = new SubscriptionUsageManager($subscription);
             $usageManager->clear();
 
-            // Renew period
             $subscription->setNewPeriod();
             $subscription->canceled_at = null;
             $subscription->save();
@@ -280,11 +215,6 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         return $this;
     }
 
-    /**
-     * Get Subscription Ability instance.
-     *
-     * @return \Morenorafael\Subscription\SubscriptionAbility
-     */
     public function ability()
     {
         if (is_null($this->ability)) {
@@ -294,23 +224,11 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         return $this->ability;
     }
 
-    /**
-     * Find by subscribable id.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder
-     * @param  int $subscribable
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeByUser($query, $subscribable)
     {
         return $query->where('subscribable_id', $subscribable);
     }
 
-    /**
-     * Find subscription with an ending trial.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeFindEndingTrial($query, $dayRange = 3)
     {
         $from = Carbon::now();
@@ -319,21 +237,11 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         $query->whereBetween('trial_ends_at', [$from, $to]);
     }
 
-    /**
-     * Find subscription with an ended trial.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeFindEndedTrial($query)
     {
         $query->where('trial_ends_at', '<=', date('Y-m-d H:i:s'));
     }
 
-    /**
-     * Find ending subscriptions.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeFindEndingPeriod($query, $dayRange = 3)
     {
         $from = Carbon::now();
@@ -342,47 +250,22 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         $query->whereBetween('ends_at', [$from, $to]);
     }
 
-    /**
-     * Scope not canceled subscriptions.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeExcludeCanceled($query)
     {
         return $query->whereNull('canceled_at');
     }
 
-    /**
-     * Scope not immediately canceled subscriptions.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeExcludeImmediatelyCanceled($query)
     {
         return $query->whereNull('canceled_immediately')
             ->orWhere('canceled_immediately', 0);
     }
 
-    /**
-     * Find ended subscriptions.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
     public function scopeFindEndedPeriod($query)
     {
         $query->where('ends_at', '<=', date('Y-m-d H:i:s'));
     }
 
-    /**
-     * Set subscription period.
-     *
-     * @param  string $interval
-     * @param  int $interval_count
-     * @param  string $start Start date
-     * @return  $this
-     */
     public function setNewPeriod($interval = '', $interval_count = '', $start = '')
     {
         if (empty($interval)) {

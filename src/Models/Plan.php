@@ -4,6 +4,7 @@ namespace Morenorafael\Subscription\Models;
 
 use Morenorafael\Subscription\Period;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Morenorafael\Subscription\Contracts\PlanInterface;
 use Morenorafael\Subscription\Exceptions\InvalidPlanFeatureException;
 
@@ -53,24 +54,14 @@ class Plan extends Model implements PlanInterface
         });
     }
 
-    /**
-     * Get plan features.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function features()
+    public function features(): HasMany
     {
-        return $this->hasMany(config('laraplans.models.plan_feature'));
+        return $this->hasMany(config('subscription.models.plan_feature'));
     }
 
-    /**
-     * Get plan subscriptions.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function subscriptions()
+    public function subscriptions(): HasMany
     {
-        return $this->hasMany(config('laraplans.models.plan_subscription'));
+        return $this->hasMany(config('subscription.models.plan_subscription'));
     }
 
     /**
@@ -94,22 +85,12 @@ class Plan extends Model implements PlanInterface
         return trans_choice('laraplans::messages.interval_description.' . $this->interval, $this->interval_count);
     }
 
-    /**
-     * Check if plan is free.
-     *
-     * @return boolean
-     */
-    public function isFree()
+    public function isFree(): bool
     {
         return ((float) $this->price <= 0.00);
     }
 
-    /**
-     * Check if plan has trial.
-     *
-     * @return boolean
-     */
-    public function hasTrial()
+    public function hasTrial(): bool
     {
         return (is_numeric($this->trial_period_days) and $this->trial_period_days > 0);
     }

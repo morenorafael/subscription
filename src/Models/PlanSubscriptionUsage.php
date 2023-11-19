@@ -3,7 +3,9 @@
 namespace Morenorafael\Subscription\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Morenorafael\Subscription\Contracts\PlanSubscriptionUsageInterface;
 
 class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterface
@@ -29,43 +31,22 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
         'created_at', 'updated_at', 'valid_until',
     ];
 
-    /**
-     * Get feature.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function feature()
+    public function feature(): BelongsTo
     {
-        return $this->belongsTo(config('laraplans.models.plan_feature'));
+        return $this->belongsTo(config('subscription.models.plan_feature'));
     }
 
-    /**
-     * Get subscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function subscription()
+    public function subscription(): BelongsTo
     {
-        return $this->belongsTo(config('laraplans.models.plan_subscription'));
+        return $this->belongsTo(config('subscription.models.plan_subscription'));
     }
 
-    /**
-     * Scope by feature code.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeByFeatureCode($query, $feature_code)
+    public function scopeByFeatureCode($query, $featureCode): Builder
     {
-        return $query->whereCode($feature_code);
+        return $query->whereCode($featureCode);
     }
 
-    /**
-     * Check whether usage has been expired or not.
-     *
-     * @return bool
-     */
-    public function isExpired()
+    public function isExpired(): bool
     {
         if (is_null($this->valid_until)) {
             return false;

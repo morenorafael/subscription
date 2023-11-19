@@ -10,14 +10,11 @@ return new class extends Migration
     {
         Schema::create('plan_features', function (Blueprint $table) {
             $table->id();
-            $table->integer('plan_id')->unsigned();
             $table->string('code');
             $table->string('value');
             $table->smallInteger('sort_order')->nullable();
+            $table->unsignedBigInteger('plan_id');
             $table->timestamps();
-
-            $table->unique(['plan_id', 'code']);
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
         });
     }
 

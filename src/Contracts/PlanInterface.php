@@ -2,13 +2,15 @@
 
 namespace Morenorafael\Subscription\Contracts;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 interface PlanInterface
 {
-    public function features();
+    public function features(): HasMany;
 
-    public function subscriptions();
+    public function subscriptions(): HasMany;
 
-    public function isFree();
+    public function isFree(): bool;
 
-    public function hasTrial();
+    public function hasTrial(): bool;
 }

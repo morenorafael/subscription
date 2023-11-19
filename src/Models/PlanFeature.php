@@ -3,6 +3,7 @@
 namespace Morenorafael\Subscription\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Morenorafael\Subscription\Traits\BelongsToPlan;
 use Morenorafael\Subscription\Contracts\PlanFeatureInterface;
 
@@ -31,16 +32,8 @@ class PlanFeature extends Model implements PlanFeatureInterface
         'created_at', 'updated_at'
     ];
 
-    /**
-     * Get feature usage.
-     *
-     * This will return all related
-     * subscriptions usages.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function usage()
+    public function usage(): HasMany
     {
-        return $this->hasMany(config('laraplans.models.plan_subscription_usage'));
+        return $this->hasMany(config('subscription.models.plan_subscription_usage'));
     }
 }

@@ -66,7 +66,7 @@ class SubscriptionAbility
             return false;
         }
 
-        if (in_array(strtoupper($feature_value), config('laraplans.positive_words'))) {
+        if (in_array(strtoupper($feature_value), config('subscription.positive_words'))) {
             return true;
         }
 

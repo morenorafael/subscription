@@ -2,16 +2,13 @@
 
 namespace Morenorafael\Subscription\Traits;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 trait BelongsToPlan
 {
-    /**
-     * Get plan.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function plan()
+    public function plan(): BelongsTo
     {
-        return $this->belongsTo(config('laraplans.models.plan'));
+        return $this->belongsTo(config('subscription.models.plan'));
     }
 
     /**

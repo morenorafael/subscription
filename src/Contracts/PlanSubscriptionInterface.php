@@ -2,27 +2,30 @@
 
 namespace Morenorafael\Subscription\Contracts;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
 interface PlanSubscriptionInterface
 {
-    public function subscribable();
+    public function subscribable(): MorphTo;
 
     public function plan();
 
-    public function usage();
+    public function usage(): HasMany;
 
-    public function getStatusAttribute();
+    public function getStatusAttribute(): string;
 
-    public function isActive();
+    public function isActive(): bool;
 
-    public function onTrial();
+    public function onTrial(): bool;
 
-    public function isCanceled();
+    public function isCanceled(): bool;
 
-    public function isEnded();
+    public function isEnded(): bool;
 
-    public function renew();
+    public function renew(): self;
 
-    public function cancel($immediately);
+    public function cancel(bool $immediately = false);
 
-    public function changePlan($plan);
+    public function changePlan($plan): self;
 }

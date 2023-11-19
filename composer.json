@@ -29,5 +29,11 @@
                 "Morenorafael\\Subscription\\Providers\\SubscriptionServiceProvider"
             ]
         }
+    },
+    "repositories": {
+        "subscription": {
+            "type": "path",
+            "url": "packages/morenorafael/subscription"
+        }
     }
 }

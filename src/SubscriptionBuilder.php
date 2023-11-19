@@ -60,7 +60,7 @@ class SubscriptionBuilder implements SubscriptionBuilderInterface
         $this->plan = $plan;
     }
 
-    public function trialDays($trialDays): self
+    public function trialDays(int $trialDays): self
     {
         $this->trialDays = $trialDays;
 

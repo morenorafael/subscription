@@ -2,11 +2,13 @@
 
 namespace Morenorafael\Subscription\Contracts;
 
+use Morenorafael\Subscription\Models\PlanSubscription;
+
 interface SubscriptionBuilderInterface
 {
-    public function trialDays($trialDays);
+    public function trialDays(int $trialDays): self;
 
-    public function skipTrial();
+    public function skipTrial(): self;
 
-    public function create(array $attributes = []);
+    public function create(array $attributes = []): PlanSubscription;
 }

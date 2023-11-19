@@ -10,14 +10,11 @@ return new class extends Migration
     {
         Schema::create('plan_subscription_usages', function (Blueprint $table) {
             $table->id();
-            $table->integer('subscription_id')->unsigned();
             $table->string('code');
-            $table->smallInteger('used')->unsigned();
+            $table->unsignedSmallInteger('used');
             $table->timestamp('valid_until')->nullable();
+            $table->unsignedBigInteger('subscription_id');
             $table->timestamps();
-
-            $table->unique(['subscription_id', 'code']);
-            $table->foreign('subscription_id')->references('id')->on('plan_subscriptions')->onDelete('cascade');
         });
     }
 

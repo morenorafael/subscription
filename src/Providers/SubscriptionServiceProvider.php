@@ -15,7 +15,7 @@ class SubscriptionServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/subscription.php', 'subscription');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/subscription.php', 'subscription');
 
         $this->app->bind(PlanInterface::class, config('subscription.models.plan'));
         $this->app->bind(PlanFeatureInterface::class, config('subscription.models.plan_feature'));
@@ -38,11 +38,11 @@ class SubscriptionServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/../database/migrations/' => database_path('migrations')
+            __DIR__ . '/../../database/migrations/' => database_path('migrations')
         ], 'subscription-migrations');
 
         $this->publishes([
-            __DIR__ . '/../config/subscription.php' => config_path('subscription.php')
+            __DIR__ . '/../../config/subscription.php' => config_path('subscription.php')
         ], 'subscription-config');
     }
 }
