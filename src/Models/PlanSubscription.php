@@ -7,11 +7,9 @@ use LogicException;
 use Morenorafael\Subscription\Period;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Morenorafael\Subscription\Models\PlanFeature;
 use Morenorafael\Subscription\SubscriptionAbility;
 use Morenorafael\Subscription\Traits\BelongsToPlan;
 use Morenorafael\Subscription\Contracts\PlanInterface;
@@ -21,10 +19,7 @@ use Morenorafael\Subscription\Events\SubscriptionSaving;
 use Morenorafael\Subscription\Events\SubscriptionCreated;
 use Morenorafael\Subscription\Events\SubscriptionRenewed;
 use Morenorafael\Subscription\Events\SubscriptionCanceled;
-use Morenorafael\Subscription\Events\SubscriptionPlanChanged;
 use Morenorafael\Subscription\Contracts\PlanSubscriptionInterface;
-use Morenorafael\Subscription\Exceptions\InvalidPlanFeatureException;
-use Morenorafael\Subscription\Exceptions\FeatureValueFormatIncompatibleException;
 
 class PlanSubscription extends Model implements PlanSubscriptionInterface
 {
@@ -120,7 +115,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
 
     public function isActive(): bool
     {
-        if ((!$this->isEnded() or $this->onTrial()) and !$this->isCanceledImmediately()) {
+        if ((!$this->isEnded() || $this->onTrial()) && !$this->isCanceledImmediately()) {
             return true;
         }
 
@@ -130,7 +125,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     public function onTrial(): bool
     {
         if (!is_null($trialEndsAt = $this->trial_ends_at)) {
-            return Carbon::now()->lt(Carbon::instance($trialEndsAt));
+            return Carbon::now()->lt(Carbon::createFromFormat('Y-m-d H:i:s', $trialEndsAt));
         }
 
         return false;
@@ -143,12 +138,12 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
 
     public function isCanceledImmediately()
     {
-        return (!is_null($this->canceled_at) and $this->canceled_immediately === true);
+        return (!is_null($this->canceled_at) && $this->canceled_immediately === true);
     }
 
     public function isEnded(): bool
     {
-        $endsAt = Carbon::instance($this->ends_at);
+        $endsAt = Carbon::createFromFormat('Y-m-d H:i:s', $this->ends_at);
 
         return Carbon::now()->gte($endsAt);
     }
@@ -177,7 +172,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         }
 
         if (
-            is_null($this->plan) or $this->plan->interval !== $plan->interval or
+            is_null($this->plan) || $this->plan->interval !== $plan->interval ||
             $this->plan->interval_count !== $plan->interval_count
         ) {
             $this->setNewPeriod($plan->interval, $plan->interval_count);
@@ -193,7 +188,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
 
     public function renew(): self
     {
-        if ($this->isEnded() and $this->isCanceled()) {
+        if ($this->isEnded() && $this->isCanceled()) {
             throw new LogicException(
                 'Unable to renew canceled ended subscription.'
             );
