@@ -1,10 +1,9 @@
-
 # Subscription
 
 ## Installation
 
 ```sh
-composer  require  morenorafael/subscription
+composer require morenorafael/subscription
 ```
 
 ### Service Provider
@@ -23,11 +22,11 @@ composer  require  morenorafael/subscription
 Publish package config file and migrations with the following command:
 
 ```sh
-php  artisan  vendor:publish  --provider="Morenorafael\Subscription\SubscriptionServiceProvider"
+php artisan vendor:publish --provider="Morenorafael\Subscription\SubscriptionServiceProvider"
 ```
 
 ```sh
-php  artisan  migrate
+php artisan migrate
 ```
 
 ### Traits and Contracts
@@ -45,12 +44,10 @@ use Morenorafael\Subscription\Traits\PlanSubscriber;
 
 class  User  extends  Authenticatable  implements  PlanSubscriberInterface
 {
-	use  PlanSubscriber;
+	use PlanSubscriber;
 
 	...
 ```
-
-
 
 ## Usage
 
@@ -61,7 +58,7 @@ class  User  extends  Authenticatable  implements  PlanSubscriberInterface
 use Morenorafael\Subscription\Models\Plan;
 use Morenorafael\Subscription\Models\PlanFeature;
 
-$plan  =  Plan::create([
+$plan = Plan::create([
 	'name' => 'Pro',
 	'description' => 'Pro plan',
 	'price' => 9.99,
@@ -72,10 +69,10 @@ $plan  =  Plan::create([
 ]);
 
 $plan->features()->saveMany([
-	new  PlanFeature(['code' => 'listings', 'value' => 50, 'sort_order' => 1]),
-	new  PlanFeature(['code' => 'pictures_per_listing', 'value' => 10, 'sort_order' => 5]),
-	new  PlanFeature(['code' => 'listing_duration_days', 'value' => 30, 'sort_order' => 10]),
-	new  PlanFeature(['code' => 'listing_title_bold', 'value' => 'Y', 'sort_order' => 15])
+	new PlanFeature(['code' => 'listings', 'value' => 50, 'sort_order' => 1]),
+	new PlanFeature(['code' => 'pictures_per_listing', 'value' => 10, 'sort_order' => 5]),
+	new PlanFeature(['code' => 'listing_duration_days', 'value' => 30, 'sort_order' => 10]),
+	new PlanFeature(['code' => 'listing_title_bold', 'value' => 'Y', 'sort_order' => 15])
 ]);
 
 ...
@@ -88,22 +85,20 @@ In some cases you need to access a particular feature in a particular plan, you 
 Example:
 
 ```php
-$feature  =  $plan->getFeatureByCode('pictures_per_listing');
+$feature = $plan->getFeatureByCode('pictures_per_listing');
 $feature->value  // Get the feature's value
 ```
-
-
 
 ### Create a Subscription
 
 First, retrieve an instance of your subscriber model, which typically will be your user model and an instance of the plan your user is subscribing to. Once you have retrieved the model instance, you may use the `newSubscription` method (available in `PlanSubscriber` trait) to create the model’s subscription.
 
 ```php
-use  Auth;
+use Auth;
 use Morenorafael\Subscription\Models\Plan;
 
-$user  =  Auth::user();
-$plan  =  Plan::find(1);
+$user = Auth::user();
+$plan = Plan::find(1);
 
 $user->newSubscription('main', $plan)->create();
 ```
@@ -130,10 +125,10 @@ public function register()
 
 There are multiple ways to determine the usage and ability of a particular feature in the user’s subscription, the most common one is `canUse`:
 
-The  `canUse`  method returns  `true`  or  `false`  depending on multiple factors:
+The `canUse` method returns `true` or `false` depending on multiple factors:
 
--   Feature  _is enabled_
--   Feature value isn’t  `0`.
+-   Feature _is enabled_
+-   Feature value isn’t `0`.
 -   Or feature has remaining uses available
 
 ```php
@@ -142,18 +137,18 @@ $user->subscription('main')->ability()->canUse('listings');
 
 **There are other ways to determine the ability of a subscription:**
 
--   `enabled`: returns  `true`  when the value of the feature is a  _positive word_  listed in the config file.
+-   `enabled`: returns `true` when the value of the feature is a _positive word_ listed in the config file.
 -   `consumed`: returns how many times the user has used a particular feature.
 -   `remainings`: returns available uses for a particular feature.
 -   `value`: returns the feature value.
 
-All methods share the same signature:  `$user->subscription('main')->ability()->consumed('listings');`.
+All methods share the same signature: `$user->subscription('main')->ability()->consumed('listings');`.
 
 ### Record Feature Usage
 
-In order to efectively use the ability methods you will need to keep track of every usage of usage based features. You may use the  `record`  method available through the user  `subscriptionUsage()`  method:
+In order to efectively use the ability methods you will need to keep track of every usage of usage based features. You may use the `record` method available through the user `subscriptionUsage()` method:
 
-The  `record`  method accepts 3 parameters: the first one is the feature’s code, the second one is the quantity of uses to add (default is  `1`), and the third one indicates if the usage should be incremented (`true`: default behavior) or overriden (`false`).
+The `record` method accepts 3 parameters: the first one is the feature’s code, the second one is the quantity of uses to add (default is `1`), and the third one indicates if the usage should be incremented (`true`: default behavior) or overriden (`false`).
 
 See the following example:
 
@@ -222,13 +217,13 @@ $user->subscription('main')->renew();
 
 ### Cancel a Subscription
 
-To cancel a subscription, simply use the  `cancel`  method on the user’s subscription:
+To cancel a subscription, simply use the `cancel` method on the user’s subscription:
 
 ```php
 $user->subscription('main')->cancel();
 ```
 
-By default, the subscription will remain active until the period ends. Pass  `true`  to  _immediately_  cancel a subscription.
+By default, the subscription will remain active until the period ends. Pass `true` to _immediately_ cancel a subscription.
 
 ```php
 $user->subscription('main')->cancel(true);
@@ -239,9 +234,9 @@ $user->subscription('main')->cancel(true);
 The following are the events fired by the package:
 
 -   `Morenorafael\Subscription\Events\SubscriptionCreated`: Fired when a subscription is created.
--   `Morenorafael\Subscription\Events\SubscriptionRenewed`: Fired when a subscription is renewed using the  `renew()`  method.
--   `Morenorafael\Subscription\Events\SubscriptionCanceled`: Fired when a subscription is canceled using the  `cancel()`  method.
--   `Morenorafael\Subscription\Events\SubscriptionPlanChanged`: Fired when a subscription’s plan is changed; it will be fired once the  `PlanSubscription`  model is saved. Plan change is determined by comparing the original and current value of  `plan_id`.
+-   `Morenorafael\Subscription\Events\SubscriptionRenewed`: Fired when a subscription is renewed using the `renew()` method.
+-   `Morenorafael\Subscription\Events\SubscriptionCanceled`: Fired when a subscription is canceled using the `cancel()` method.
+-   `Morenorafael\Subscription\Events\SubscriptionPlanChanged`: Fired when a subscription’s plan is changed; it will be fired once the `PlanSubscription` model is saved. Plan change is determined by comparing the original and current value of `plan_id`.
 
 ## Eloquent Scopes
 
